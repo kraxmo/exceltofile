@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 """
-Super exporter: export each worksheet in an Excel workbook to separate CSV files.
-
-This script is a **merged superset** based on two prior utilities:
-- `export_excel_sheets.py` (richer CLI: quoting/NA/escapechar/sheet selection/delimiter parsing)
-- `excel_to_csv.py` (safety features: tabular detection & skip, header delimiter validation,
-    timestamp collision avoidance, structured logging)
+Export each worksheet in an Excel workbook to separate CSV files.
 
 Key capabilities:
 • Per‑sheet export with robust delimiter/quoting/NA options.
@@ -14,18 +9,11 @@ Key capabilities:
 • Safe filename construction and timestamp suffix when an output would be overwritten.
 • Optional logging with configurable level.
 
-3rd‑party justification (aligning with a preference for stdlib first):
-- Reading/writing modern Excel (.xlsx) requires libraries not present in the Python stdlib.
-  This tool uses **pandas** (for reliable sheet parsing) with **openpyxl** engine.
-There is no stdlib equivalent for .xlsx I/O; csv handling remains stdlib (csv module).
-- Pros: mature ecosystem, strong Excel interop, stable maintenance. Cons: larger dependency
-    footprint and import time compared to hand‑rolled parsers.
-
 CLI examples:
-super_export_excel_to_file.py SalesData.xlsx --out-dir ./out --prefix run01 \
+export_excel_to_file.py SalesData.xlsx --out-dir ./out --prefix run01 \
     --delimiter tab --quoting minimal --na-rep N/A --log-level INFO
 
-Output filename pattern (Option A base):
+Output filename pattern:
 {prefix}_{sanitized_sheet_name}_{sanitized_base}.csv
 
 Exit codes:
