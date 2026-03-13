@@ -53,38 +53,46 @@ class TestSuperExportExcelToFile(unittest.TestCase):
         r = Rubric()
 
         # 1) Happy path (pipe delimiter, selected sheets)
+        print("\n# 1) Happy path (pipe delimiter, selected sheets)")
         self._run_cli('--prefix','run01','--sheets','Sheet1','Empty','Q1 Summary','--allow-delimiter-in-header','--delimiter','pipe','--log-level','ERROR')
         files = sorted(p for p in self.out.iterdir() if p.name.startswith('run01_'))
         r.add(any(p.name.startswith('run01_Sheet1_') for p in files), 10, 'Sheet1 not exported')
         r.add(not any('Empty_' in p.name for p in files), 10, 'Empty sheet not skipped')
 
         # 2) NA representation default is empty string (so sequence ",," should appear)
+        print("# 2) NA representation default is empty string (so sequence ',,' should appear)")
         s1 = next(p for p in files if 'Sheet1_' in p.name)
         text = s1.read_text(encoding='utf-8')
         r.add('1|x|' in text or '|N/A' in text, 5, 'NA representation not reflected')
 
         # 3) Delimiter keyword parsing (tab)
+        print("# 3) Delimiter keyword parsing (tab)")
         self._run_cli('--prefix','tab','--sheets','Sheet1','--delimiter','tab')
         tfile = next(p for p in self.out.iterdir() if p.name.startswith('tab_Sheet1_'))
         r.add('	' in tfile.read_text(encoding='utf-8'), 10, 'tab delimiter not used')
 
         # 4) Quoting none auto-escape notice (just ensure file written)
+        print("# 4) Quoting none auto-escape notice (just ensure file written)")
         self._run_cli('--prefix','noq','--sheets','Sheet1','--quoting','none')
         r.add(any(p.name.startswith('noq_Sheet1_') for p in self.out.iterdir()), 5, 'quoting none export failed')
 
         # 5) Header delimiter validation should cause non-zero rc
+        print("# 5) Header delimiter validation should cause non-zero rc")
         cp = self._run_cli('--prefix','vchk','--sheets','BadHeader', '--delimiter', ',', '--log-level','ERROR', expect_ok=False)
         r.add(cp.returncode != 0, 15, 'header delimiter validation did not fail CLI as expected')
 
         # 6) Allow delimiter in header bypass
+        print("# 6) Allow delimiter in header bypass")
         self._run_cli('--prefix','allow','--sheets','BadHeader','--allow-delimiter-in-header')
         r.add(any(p.name.startswith('allow_BadHeader_') for p in self.out.iterdir()), 10, 'allow flag ineffective')
 
         # 7) No header (-1)
+        print("# 7) No header (-1)")
         self._run_cli('--prefix','nh','--sheets','NoHeader','--header-row','-1')
         r.add(any(p.name.startswith('nh_NoHeader_') for p in self.out.iterdir()), 10, 'no-header export failed')
 
         # 8) Filename collision avoidance: pre-create collision name and export w/o prefix
+        print("# 8) Filename collision avoidance: pre-create collision name and export w/o prefix")
         coll = self.out / f"Sheet1_{self.xlsx.stem}.csv"
         coll.write_text('dummy', encoding='utf-8')
         self._run_cli('--sheets','Sheet1')
