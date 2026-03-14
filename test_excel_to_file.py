@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 
-SCRIPT = 'export_excel_to_file.py'
+SCRIPT = 'excel_to_file.py'
 
 class Rubric:
     def __init__(self):
@@ -25,7 +25,7 @@ class Rubric:
     def score(self) -> float:
         return 100.0 * (self.points / self.total if self.total else 0.0)
 
-class TestSuperExportExcelToFile(unittest.TestCase):
+class TestExcelToFile(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.TemporaryDirectory()
         self.base = Path(self.tmpdir.name)
